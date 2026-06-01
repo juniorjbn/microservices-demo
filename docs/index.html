@@ -725,7 +725,7 @@
     <div class="cmd-box">
       <pre><span class="prompt">$</span> kubectl get pods -n onlineboutique
 <span class="prompt">$</span> kubectl logs -n onlineboutique deployment/frontend
-<span class="prompt">$</span> kubectl get svc -n onlineboutique frontend-external
+<span class="prompt">$</span> kubectl port-forward -n onlineboutique svc/frontend 8080:80
 
 <span class="comment"># Remover tudo</span>
 <span class="prompt">$</span> helm uninstall onlineboutique -n onlineboutique
