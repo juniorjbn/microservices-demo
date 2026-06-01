@@ -681,31 +681,21 @@
 
     <div class="cmd-group">
       <h3>Deploy com suas imagens (Docker Hub)</h3>
-      <p class="desc">Usa o chart Helm local apontando para suas imagens no Docker Hub em <code>juniorjbn/*:v1.0.0</code>.</p>
+      <p class="desc">Builda e faz push das imagens para o Docker Hub, depois faz deploy no Kind.</p>
       <div class="cmd-box">
         <pre><span class="comment"># 1. Criar cluster Kind</span>
 <span class="prompt">$</span> kind create cluster --name onlineboutique
 
-<span class="comment"># 2. Buildar e push das imagens</span>
+<span class="comment"># 2. Buildar e fazer push das imagens</span>
 <span class="prompt">$</span> ./build.sh
 
-<span class="comment"># 3. Deploy via Helm com suas imagens</span>
-<span class="prompt">$</span> helm upgrade onlineboutique ./helm-chart \
-    --install \
-    --create-namespace \
-    --namespace onlineboutique \
-    --set images.repository=juniorjbn \
-    --set images.tag=v1.0.0
+<span class="comment"># 3. Fazer deploy</span>
+<span class="prompt">$</span> ./deploy.sh
 
-<span class="comment"># 4. Carregar imagens no Kind (se não vieram do build.sh)</span>
-<span class="prompt">$</span> kind load docker-image juniorjbn/frontend:v1.0.0 --name onlineboutique
-<span class="prompt">$</span> kind load docker-image juniorjbn/currencyservice:v1.0.0 --name onlineboutique
-<span class="prompt">$</span> # repita para os demais serviços
-
-<span class="comment"># 5. Acompanhar os pods</span>
+<span class="comment"># 4. Acompanhar os pods</span>
 <span class="prompt">$</span> kubectl get pods -n onlineboutique -w
 
-<span class="comment"># 6. Acessar (port-forward)</span>
+<span class="comment"># 5. Acessar (port-forward)</span>
 <span class="prompt">$</span> kubectl port-forward -n onlineboutique \
     svc/frontend 8080:80
 
@@ -714,21 +704,13 @@
     </div>
 
     <div class="cmd-group">
-      <h3>Deploy local com Kind</h3>
-      <p class="desc">Usa o chart Helm local com images do Docker Hub (<code>juniorjbn/*:v1.0.0</code>) em cluster Kind.</p>
+      <h3>Deploy rápido (Kind + imagens já no Docker Hub)</h3>
+      <p class="desc">Pula o build local e usa as imagens já disponíveis em <code>juniorjbn/*:v1.0.0</code>.</p>
       <div class="cmd-box">
         <pre><span class="comment"># Criar cluster</span>
 <span class="prompt">$</span> kind create cluster --name onlineboutique
 
-<span class="comment"># Deploy via Helm (chart local)</span>
-<span class="prompt">$</span> helm upgrade onlineboutique ./helm-chart \
-    --install \
-    --create-namespace \
-    --namespace onlineboutique \
-    --set images.repository=juniorjbn \
-    --set images.tag=v1.0.0
-
-<span class="comment"># Carregar imagens locais no Kind</span>
+<span class="comment"># Deploy via script (helm + namespace)</span>
 <span class="prompt">$</span> ./deploy.sh
 
 <span class="comment"># Port-forward</span>
