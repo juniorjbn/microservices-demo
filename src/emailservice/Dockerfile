@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.10.13-slim@sha256:1d517e04d033a04d86f7de57bf41cae166ca362b37a1cb229e326bc1d754db55 as base
+FROM python:3.11-slim AS base
 
-FROM base as builder
+FROM base AS builder
 
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends \
@@ -23,7 +23,7 @@ RUN apt-get -qq update \
 
 # get packages
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir --no-deps -r requirements.txt
 
 FROM base
 # Enable unbuffered logging
@@ -34,10 +34,13 @@ ENV ENABLE_PROFILER=1
 WORKDIR /email_server
 
 # Grab packages from builder
-COPY --from=builder /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
+COPY --from=builder /usr/local/lib/python3.11/ /usr/local/lib/python3.11/
 
 # Add the application
 COPY . .
+
+RUN groupadd -r appuser && useradd -r -g appuser -u 10001 appuser
+USER appuser
 
 EXPOSE 8080
 ENTRYPOINT [ "python", "email_server.py" ]

@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"math/rand"
@@ -27,12 +28,54 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/text/language"
 
 	pb "github.com/GoogleCloudPlatform/microservices-demo/src/frontend/genproto"
 	"github.com/GoogleCloudPlatform/microservices-demo/src/frontend/money"
 )
+
+type localeOption struct {
+	Label string
+	Value string
+}
+
+var (
+	bundle        *i18n.Bundle
+	defaultLocale = "pt-BR"
+	localeOptions = []localeOption{
+		{Label: "Português (BRL)", Value: "pt-BR|BRL"},
+		{Label: "English (USD)", Value: "en|USD"},
+		{Label: "English (EUR)", Value: "en|EUR"},
+		{Label: "English (JPY)", Value: "en|JPY"},
+		{Label: "English (GBP)", Value: "en|GBP"},
+		{Label: "English (CAD)", Value: "en|CAD"},
+		{Label: "English (TRY)", Value: "en|TRY"},
+	}
+)
+
+func init() {
+	bundle = i18n.NewBundle(language.English)
+	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
+	bundle.MustLoadMessageFile("locales/en.json")
+	bundle.MustLoadMessageFile("locales/pt-BR.json")
+}
+
+func t(locale, messageID string) string {
+	localizer := i18n.NewLocalizer(bundle, locale)
+	return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: messageID})
+}
+
+func productName(locale, productID, fallback string) string {
+	localizer := i18n.NewLocalizer(bundle, locale)
+	result, err := localizer.Localize(&i18n.LocalizeConfig{MessageID: "product_" + productID})
+	if err != nil {
+		return fallback
+	}
+	return result
+}
 
 type platformDetails struct {
 	css      string
@@ -42,10 +85,12 @@ type platformDetails struct {
 var (
 	frontendMessage = strings.TrimSpace(os.Getenv("FRONTEND_MESSAGE"))
 	isCymbalBrand   = "true" == strings.ToLower(os.Getenv("CYMBAL_BRANDING"))
-	templates       = template.Must(template.New("").
-			Funcs(template.FuncMap{
+	templates = template.Must(template.New("").
+		Funcs(template.FuncMap{
 			"renderMoney":        renderMoney,
 			"renderCurrencyLogo": renderCurrencyLogo,
+			"t":                  t,
+			"productName":        productName,
 		}).ParseGlob("templates/*.html"))
 	plat platformDetails
 )
@@ -104,20 +149,23 @@ func (fe *frontendServer) homeHandler(w http.ResponseWriter, r *http.Request) {
 	plat.setPlatformDetails(strings.ToLower(env))
 
 	if err := templates.ExecuteTemplate(w, "home", map[string]interface{}{
-		"session_id":        sessionID(r),
-		"request_id":        r.Context().Value(ctxKeyRequestID{}),
-		"user_currency":     currentCurrency(r),
-		"show_currency":     true,
-		"currencies":        currencies,
-		"products":          ps,
-		"cart_size":         cartSize(cart),
-		"banner_color":      os.Getenv("BANNER_COLOR"), // illustrates canary deployments
-		"ad":                fe.chooseAd(r.Context(), []string{}, log),
-		"platform_css":      plat.css,
-		"platform_name":     plat.provider,
-		"is_cymbal_brand":   isCymbalBrand,
-		"deploymentDetails": deploymentDetailsMap,
-		"frontendMessage":   frontendMessage,
+		"session_id":          sessionID(r),
+		"request_id":          r.Context().Value(ctxKeyRequestID{}),
+		"user_currency":       currentCurrency(r),
+		"show_currency":       true,
+		"locale":              currentLocale(r),
+		"locale_options":      localeOptions,
+		"current_locale_value": currentLocaleValue(r),
+		"currencies":          currencies,
+		"products":            ps,
+		"cart_size":           cartSize(cart),
+		"banner_color":        os.Getenv("BANNER_COLOR"), // illustrates canary deployments
+		"ad":                  fe.chooseAd(r.Context(), []string{}, log),
+		"platform_css":        plat.css,
+		"platform_name":       plat.provider,
+		"is_cymbal_brand":     isCymbalBrand,
+		"deploymentDetails":   deploymentDetailsMap,
+		"frontendMessage":     frontendMessage,
 	}); err != nil {
 		log.Error(err)
 	}
@@ -200,21 +248,24 @@ func (fe *frontendServer) productHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := templates.ExecuteTemplate(w, "product", map[string]interface{}{
-		"session_id":        sessionID(r),
-		"request_id":        r.Context().Value(ctxKeyRequestID{}),
-		"ad":                fe.chooseAd(r.Context(), p.Categories, log),
-		"user_currency":     currentCurrency(r),
-		"show_currency":     true,
-		"currencies":        currencies,
-		"product":           product,
-		"recommendations":   recommendations,
-		"cart_size":         cartSize(cart),
-		"platform_css":      plat.css,
-		"platform_name":     plat.provider,
-		"is_cymbal_brand":   isCymbalBrand,
-		"deploymentDetails": deploymentDetailsMap,
-		"frontendMessage":   frontendMessage,
-		"packagingInfo":     packagingInfo,
+		"session_id":          sessionID(r),
+		"request_id":          r.Context().Value(ctxKeyRequestID{}),
+		"ad":                  fe.chooseAd(r.Context(), p.Categories, log),
+		"user_currency":       currentCurrency(r),
+		"show_currency":       true,
+		"locale":              currentLocale(r),
+		"locale_options":      localeOptions,
+		"current_locale_value": currentLocaleValue(r),
+		"currencies":          currencies,
+		"product":             product,
+		"recommendations":     recommendations,
+		"cart_size":           cartSize(cart),
+		"platform_css":        plat.css,
+		"platform_name":       plat.provider,
+		"is_cymbal_brand":     isCymbalBrand,
+		"deploymentDetails":   deploymentDetailsMap,
+		"frontendMessage":     frontendMessage,
+		"packagingInfo":       packagingInfo,
 	}); err != nil {
 		log.Println(err)
 	}
@@ -312,22 +363,25 @@ func (fe *frontendServer) viewCartHandler(w http.ResponseWriter, r *http.Request
 	year := time.Now().Year()
 
 	if err := templates.ExecuteTemplate(w, "cart", map[string]interface{}{
-		"session_id":        sessionID(r),
-		"request_id":        r.Context().Value(ctxKeyRequestID{}),
-		"user_currency":     currentCurrency(r),
-		"currencies":        currencies,
-		"recommendations":   recommendations,
-		"cart_size":         cartSize(cart),
-		"shipping_cost":     shippingCost,
-		"show_currency":     true,
-		"total_cost":        totalPrice,
-		"items":             items,
-		"expiration_years":  []int{year, year + 1, year + 2, year + 3, year + 4},
-		"platform_css":      plat.css,
-		"platform_name":     plat.provider,
-		"is_cymbal_brand":   isCymbalBrand,
-		"deploymentDetails": deploymentDetailsMap,
-		"frontendMessage":   frontendMessage,
+		"session_id":          sessionID(r),
+		"request_id":          r.Context().Value(ctxKeyRequestID{}),
+		"user_currency":       currentCurrency(r),
+		"locale":              currentLocale(r),
+		"locale_options":      localeOptions,
+		"current_locale_value": currentLocaleValue(r),
+		"currencies":          currencies,
+		"recommendations":     recommendations,
+		"cart_size":           cartSize(cart),
+		"shipping_cost":       shippingCost,
+		"show_currency":       true,
+		"total_cost":          totalPrice,
+		"items":               items,
+		"expiration_years":    []int{year, year + 1, year + 2, year + 3, year + 4},
+		"platform_css":        plat.css,
+		"platform_name":       plat.provider,
+		"is_cymbal_brand":     isCymbalBrand,
+		"deploymentDetails":   deploymentDetailsMap,
+		"frontendMessage":     frontendMessage,
 	}); err != nil {
 		log.Println(err)
 	}
@@ -389,19 +443,22 @@ func (fe *frontendServer) placeOrderHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := templates.ExecuteTemplate(w, "order", map[string]interface{}{
-		"session_id":        sessionID(r),
-		"request_id":        r.Context().Value(ctxKeyRequestID{}),
-		"user_currency":     currentCurrency(r),
-		"show_currency":     false,
-		"currencies":        currencies,
-		"order":             order.GetOrder(),
-		"total_paid":        &totalPaid,
-		"recommendations":   recommendations,
-		"platform_css":      plat.css,
-		"platform_name":     plat.provider,
-		"is_cymbal_brand":   isCymbalBrand,
-		"deploymentDetails": deploymentDetailsMap,
-		"frontendMessage":   frontendMessage,
+		"session_id":          sessionID(r),
+		"request_id":          r.Context().Value(ctxKeyRequestID{}),
+		"user_currency":       currentCurrency(r),
+		"show_currency":       false,
+		"locale":              currentLocale(r),
+		"locale_options":      localeOptions,
+		"current_locale_value": currentLocaleValue(r),
+		"currencies":          currencies,
+		"order":               order.GetOrder(),
+		"total_paid":          &totalPaid,
+		"recommendations":     recommendations,
+		"platform_css":        plat.css,
+		"platform_name":       plat.provider,
+		"is_cymbal_brand":     isCymbalBrand,
+		"deploymentDetails":   deploymentDetailsMap,
+		"frontendMessage":     frontendMessage,
 	}); err != nil {
 		log.Println(err)
 	}
@@ -440,6 +497,34 @@ func (fe *frontendServer) setCurrencyHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusFound)
 }
 
+func (fe *frontendServer) setLocaleHandler(w http.ResponseWriter, r *http.Request) {
+	log := r.Context().Value(ctxKeyLog{}).(logrus.FieldLogger)
+	locale := r.FormValue("locale")
+	log.WithField("locale.new", locale).Debug("setting locale")
+
+	if locale != "" {
+		parts := strings.SplitN(locale, "|", 2)
+		if len(parts) == 2 {
+			http.SetCookie(w, &http.Cookie{
+				Name:   cookieLocale,
+				Value:  parts[0],
+				MaxAge: cookieMaxAge,
+			})
+			http.SetCookie(w, &http.Cookie{
+				Name:   cookieCurrency,
+				Value:  parts[1],
+				MaxAge: cookieMaxAge,
+			})
+		}
+	}
+	referer := r.Header.Get("referer")
+	if referer == "" {
+		referer = "/"
+	}
+	w.Header().Set("Location", referer)
+	w.WriteHeader(http.StatusFound)
+}
+
 // chooseAd queries for advertisements available and randomly chooses one, if
 // available. It ignores the error retrieving the ad since it is not critical.
 func (fe *frontendServer) chooseAd(ctx context.Context, ctxKeys []string, log logrus.FieldLogger) *pb.Ad {
@@ -458,14 +543,17 @@ func renderHTTPError(log logrus.FieldLogger, r *http.Request, w http.ResponseWri
 	w.WriteHeader(code)
 
 	if templateErr := templates.ExecuteTemplate(w, "error", map[string]interface{}{
-		"session_id":        sessionID(r),
-		"request_id":        r.Context().Value(ctxKeyRequestID{}),
-		"error":             errMsg,
-		"status_code":       code,
-		"status":            http.StatusText(code),
-		"is_cymbal_brand":   isCymbalBrand,
-		"deploymentDetails": deploymentDetailsMap,
-		"frontendMessage":   frontendMessage,
+		"session_id":          sessionID(r),
+		"request_id":          r.Context().Value(ctxKeyRequestID{}),
+		"locale":              currentLocale(r),
+		"locale_options":      localeOptions,
+		"current_locale_value": currentLocaleValue(r),
+		"error":               errMsg,
+		"status_code":         code,
+		"status":              http.StatusText(code),
+		"is_cymbal_brand":     isCymbalBrand,
+		"deploymentDetails":   deploymentDetailsMap,
+		"frontendMessage":     frontendMessage,
 	}); templateErr != nil {
 		log.Println(templateErr)
 	}
@@ -477,6 +565,25 @@ func currentCurrency(r *http.Request) string {
 		return c.Value
 	}
 	return defaultCurrency
+}
+
+func currentLocale(r *http.Request) string {
+	c, _ := r.Cookie(cookieLocale)
+	if c != nil {
+		return c.Value
+	}
+	return defaultLocale
+}
+
+func currentLocaleValue(r *http.Request) string {
+	l := currentLocale(r)
+	c := currentCurrency(r)
+	for _, o := range localeOptions {
+		if o.Value == l+"|"+c {
+			return o.Value
+		}
+	}
+	return localeOptions[0].Value
 }
 
 func sessionID(r *http.Request) string {
@@ -504,8 +611,21 @@ func cartSize(c []*pb.CartItem) int {
 	return cartSize
 }
 
-func renderMoney(money pb.Money) string {
+func renderMoney(locale string, money pb.Money) string {
 	currencyLogo := renderCurrencyLogo(money.GetCurrencyCode())
+	if locale == "pt-BR" && money.GetCurrencyCode() == "BRL" {
+		intPart := money.GetUnits()
+		decPart := money.GetNanos() / 10000000
+		intStr := fmt.Sprintf("%d", intPart)
+		var result strings.Builder
+		for i, c := range intStr {
+			if i > 0 && (len(intStr)-i)%3 == 0 {
+				result.WriteRune('.')
+			}
+			result.WriteRune(c)
+		}
+		return fmt.Sprintf("%s %s,%02d", currencyLogo, result.String(), decPart)
+	}
 	return fmt.Sprintf("%s%d.%02d", currencyLogo, money.GetUnits(), money.GetNanos()/10000000)
 }
 
@@ -517,6 +637,7 @@ func renderCurrencyLogo(currencyCode string) string {
 		"EUR": "€",
 		"TRY": "₺",
 		"GBP": "£",
+		"BRL": "R$",
 	}
 
 	logo := "$" //default

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM node:20.8.0-alpine@sha256:37750e51d61bef92165b2e29a77da4277ba0777258446b7a9c99511f119db096 as base
+FROM node:22-alpine AS base
 
-FROM base as builder
+FROM base AS builder
 
 # Some packages (e.g. @google-cloud/profiler) require additional
 # deps for post-install scripts
@@ -36,6 +36,9 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 COPY . .
+
+RUN adduser -D -u 10001 appuser
+USER appuser
 
 EXPOSE 50051
 

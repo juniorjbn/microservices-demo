@@ -1,27 +1,9 @@
-<!--
- Copyright 2020 Google LLC
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 {{ define "header" }}
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="{{ $.locale }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {{ if $.is_cymbal_brand }}
         Cymbal Shops
@@ -29,11 +11,6 @@
         Online Boutique
         {{ end }}
     </title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
-        crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/static/styles/styles.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/cart.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/order.css">
@@ -43,52 +20,39 @@
     <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.ico' />
     {{ end }}
 </head>
-
 <body>
     <header>
         {{ if $.frontendMessage }}
-        <div class="navbar">
-            <div class="container d-flex justify-content-center">
-                <div class="h-free-shipping">{{ $.frontendMessage }}</div>
-            </div>
-        </div>
+        <div class="nav-message">{{ $.frontendMessage }}</div>
         {{ end }}
-        <div class="navbar sub-navbar">
-            <div class="container d-flex justify-content-between">
-                <a href="/" class="navbar-brand d-flex align-items-center">
-                    {{ if $.is_cymbal_brand }}
-                    <img src="/static/icons/Cymbal_NavLogo.svg" alt="" class="top-left-logo-cymbal" />
-                    {{ else }}
-                    <img src="/static/icons/Hipster_NavLogo.svg" alt="" class="top-left-logo" />
-                    {{ end }}
+        <nav class="nav">
+            <div class="nav-inner">
+                <a href="/" class="nav-logo">
+                    <img src="/static/images/botique-logo.png" alt="" />
+                    <span class="nav-title">Minimal Boutique</span>
                 </a>
-                <div class="controls">
-
+                <div class="nav-controls">
                     {{ if $.show_currency }}
-                    <div class="h-controls">
-                        <div class="h-control">
-                            <span class="icon currency-icon"> {{ renderCurrencyLogo $.user_currency}}</span>
-                            <form method="POST" class="controls-form" action="/setCurrency" id="currency_form" >
-                                <select name="currency_code" onchange="document.getElementById('currency_form').submit();">
-                                        {{range $.currencies}}
-                                    <option value="{{.}}" {{if eq . $.user_currency}}selected="selected"{{end}}>{{.}}</option>
-                                    {{end}}
-                                </select>
-                            </form>
-                            <img src="/static/icons/Hipster_DownArrow.svg" alt="" class="icon arrow" />
-                        </div>
+                    <div class="nav-currency">
+                        <form method="POST" action="/setLocale" id="locale_form">
+                            <select name="locale" onchange="document.getElementById('locale_form').submit();">
+                                {{range $.locale_options}}
+                                <option value="{{.Value}}" {{if eq .Value $.current_locale_value}}selected="selected"{{end}}>{{.Label}}</option>
+                                {{end}}
+                            </select>
+                        </form>
                     </div>
                     {{ end }}
-
-                    <a href="/cart" class="cart-link">
-                        <img src="/static/icons/Hipster_CartIcon.svg" alt="Cart icon" class="logo" title="Cart" />
+                    <a href="/cart" class="nav-cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.4 11" width="22" height="22" fill="#f5f4f0">
+                            <path d="M0 0v1.1h1.1l2 4.17-.75 1.35a1.1 1.1 0 0 0-.13.53c0 .61.5 1.1 1.1 1.1h6.66v-1.1H8a.15.15 0 0 1-.15-.14v-.06l.5-.9h4.1c.41.01.8-.2 1-.57l1.46-4.4H6.7L6.25 0H0zm2.71 2.08h6.5l-1 3.06-4.16-.01-1.34-3.05zm.59 6.72a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2zm5.5 0a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z"/>
+                        </svg>
                         {{ if $.cart_size }}
-                        <span class="cart-size-circle">{{$.cart_size}}</span>
+                        <span class="cart-badge">{{$.cart_size}}</span>
                         {{ end }}
                     </a>
                 </div>
             </div>
-        </div>
-
+        </nav>
     </header>
-    {{end}}
+{{end}}

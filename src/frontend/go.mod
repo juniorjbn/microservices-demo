@@ -1,6 +1,6 @@
 module github.com/GoogleCloudPlatform/microservices-demo/src/frontend
 
-go 1.19
+go 1.24.0
 
 require (
 	cloud.google.com/go/compute/metadata v0.2.3
@@ -8,6 +8,7 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.4.0
 	github.com/gorilla/mux v1.8.1
+	github.com/nicksnyder/go-i18n/v2 v2.6.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.1
@@ -16,6 +17,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.21.0
 	go.opentelemetry.io/otel/sdk v1.21.0
 	golang.org/x/net v0.19.0
+	golang.org/x/text v0.32.0
 	google.golang.org/grpc v1.59.0
 )
 
@@ -39,9 +41,8 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
-	golang.org/x/sync v0.3.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/api v0.128.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230822172742-b8732ec3820d // indirect

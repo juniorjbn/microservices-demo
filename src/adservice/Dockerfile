@@ -38,5 +38,8 @@ RUN mkdir -p /opt/cprof && \
 WORKDIR /app
 COPY --from=builder /app .
 
+RUN adduser -D -u 10001 appuser
+USER appuser
+
 EXPOSE 9555
 ENTRYPOINT ["/app/build/install/hipstershop/bin/AdService"]

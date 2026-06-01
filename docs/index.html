@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Boutique — Guia do App</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: oklch(0.15 0.02 270);
+    --ink-muted: oklch(0.35 0.02 270);
+    --surface: oklch(0.97 0.005 80);
+    --surface-elevated: oklch(0.99 0.003 80);
+    --brand: oklch(0.55 0.18 270);
+    --brand-dim: oklch(0.45 0.16 270);
+    --accent: oklch(0.6 0.2 200);
+    --muted: oklch(0.88 0.01 250);
+    --radius: 10px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--surface);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---- Header ---- */
+  header {
+    background: var(--ink);
+    color: oklch(0.92 0.01 270);
+    padding: 72px 0 64px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  header h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: #fff;
+    text-wrap: balance;
+  }
+
+  header .subtitle {
+    margin-top: 12px;
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    color: oklch(0.75 0.04 270);
+    max-width: 620px;
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+
+  .lang-chips {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 24px;
+  }
+
+  .lang-chips span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: oklch(1 0 0 / 0.1);
+    color: oklch(0.85 0.03 270);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* ---- Sections ---- */
+  section { padding: 64px 0; }
+  section:nth-child(even) { background: var(--surface-elevated); }
+
+  h2 {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: 8px;
+    text-wrap: balance;
+  }
+
+  .section-intro {
+    font-size: 1rem;
+    color: var(--ink-muted);
+    max-width: 680px;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  /* ---- Architecture image ---- */
+  .arch-figure {
+    margin: 32px 0;
+    text-align: center;
+  }
+
+  .arch-figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 16px oklch(0 0 0 / 0.08);
+  }
+
+  .arch-figure figcaption {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+  }
+
+  /* ---- Service taxonomy ---- */
+  .taxonomy-hint {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--muted);
+    border-radius: var(--radius);
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+  }
+
+  .taxonomy-hint span { display: inline-flex; align-items: center; gap: 5px; }
+  .hint-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+
+  .service-item {
+    background: var(--surface-elevated);
+    border: 1px solid var(--muted);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: box-shadow 0.25s ease, translate 0.25s ease;
+  }
+
+  @media (hover: hover) {
+    .service-item:hover {
+      box-shadow: 0 4px 20px oklch(0 0 0 / 0.06);
+      translate: 0 -2px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-item { transition: none; }
+    .service-item:hover { translate: none; }
+  }
+
+  .service-item .head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .lang-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .lang-go { background: oklch(0.7 0.15 210); color: #fff; }
+  .lang-node { background: oklch(0.55 0.18 145); color: #fff; }
+  .lang-py { background: oklch(0.5 0.14 250); color: #fff; }
+  .lang-java { background: oklch(0.55 0.16 70); color: #fff; }
+  .lang-cs { background: oklch(0.5 0.18 290); color: #fff; }
+  .lang-redis { background: oklch(0.55 0.22 30); color: #fff; }
+  .lang-locust { background: oklch(0.5 0.22 310); color: #fff; }
+
+  .service-item .name {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .service-item .desc {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    line-height: 1.55;
+  }
+
+  .service-item .meta {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: oklch(0.5 0.03 270);
+  }
+
+  .service-item .meta strong { color: var(--ink); font-weight: 500; }
+
+  /* ---- Flow diagram ---- */
+  .flow-wrapper {
+    background: var(--ink);
+    border-radius: var(--radius);
+    padding: 28px;
+    overflow-x: auto;
+    margin: 20px 0 24px;
+  }
+
+  .flow-wrapper pre {
+    color: oklch(0.85 0.03 270);
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    white-space: pre;
+  }
+
+  /* ---- Steps list ---- */
+  .steps { list-style: none; counter-reset: step; }
+
+  .steps li {
+    padding: 10px 0 10px 42px;
+    position: relative;
+    border-left: 2px solid var(--muted);
+    margin-left: 14px;
+  }
+
+  .steps li:last-child { border-left-color: transparent; }
+
+  .steps li::before {
+    content: counter(step);
+    counter-increment: step;
+    position: absolute;
+    left: -15px;
+    top: 8px;
+    width: 28px;
+    height: 28px;
+    background: var(--brand);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 650;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .steps { counter-reset: step; }
+
+  /* ---- Command boxes ---- */
+  .cmd-group { margin-top: 24px; }
+  .cmd-group h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .cmd-group .desc {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+
+  .cmd-box {
+    background: var(--ink);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+
+  .cmd-box pre {
+    color: oklch(0.75 0.06 240);
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    white-space: pre;
+  }
+
+  .cmd-box .prompt { color: oklch(0.65 0.15 145); }
+  .cmd-box .comment { color: oklch(0.5 0.03 270); font-style: italic; }
+
+  .cmd-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: oklch(0.55 0.03 270);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+
+  /* ---- Links ---- */
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---- Footer ---- */
+  footer {
+    text-align: center;
+    padding: 32px 0;
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 640px) {
+    header { padding: 48px 0 40px; }
+    section { padding: 40px 0; }
+    .service-grid { grid-template-columns: 1fr; }
+    .flow-wrapper { padding: 16px; }
+    .flow-wrapper pre { font-size: 0.7rem; }
+    .cmd-box pre { font-size: 0.75rem; }
+    .container { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>Online Boutique</h1>
+    <p class="subtitle">
+      Um e-commerce completo feito com 11 microsserviços em 6 linguagens.<br>
+      Cada serviço é independente, tem seu próprio banco de código e se comunica via gRPC.
+    </p>
+    <div class="lang-chips">
+      <span>Go</span><span>Node.js</span><span>Python</span><span>Java</span><span>C# (.NET)</span><span>Redis</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <h2>O que é esse app?</h2>
+    <p class="section-intro">
+      O <strong>Online Boutique</strong> é uma loja virtual fictícia que vende camisetas, canecas, livros e outros itens.
+      Ele foi criado pelo Google para demonstrar o modelo de <strong>microsserviços</strong>: em vez de um programa monolítico,
+      o app é dividido em serviços pequenos e autônomos, escritos em linguagens diferentes, cada um com uma responsabilidade
+      bem definida. Eles conversam entre si via <strong>gRPC</strong>.
+    </p>
+
+    <figure class="arch-figure">
+      <img src="img/architecture-diagram.png" alt="Diagrama de arquitetura dos microsserviços" loading="lazy">
+      <figcaption>Cada bloco no diagrama é um serviço independente, com sua própria linguagem e ciclo de vida</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Os serviços</h2>
+    <p class="section-intro">
+      Cada serviço tem um papel único. Juntos eles formam a loja completa.
+    </p>
+
+    <div class="taxonomy-hint">
+      <span><span class="hint-dot" style="background:oklch(0.55 0.18 270)"></span> gRPC</span>
+      <span><span class="hint-dot" style="background:oklch(0.6 0.18 80)"></span> HTTP (navegador)</span>
+      <span><span class="hint-dot" style="background:oklch(0.55 0.22 30)"></span> Redis (cache)</span>
+    </div>
+
+    <div class="service-grid">
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-go">Go</span>
+          <span class="name">frontend</span>
+        </div>
+        <p class="desc">Monta e serve a página da loja. É a única interface que o usuário enxerga. Coordena todos os outros serviços para exibir produtos, preços, carrinho e anúncios.</p>
+        <div class="meta">Porta 8080 (HTTP) · <strong>Chama:</strong> todos os demais serviços</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-cs">C#</span>
+          <span class="name">cartservice</span>
+        </div>
+        <p class="desc">Mantém o carrinho de compras do usuário. Cada item adicionado ou removido passa por aqui. Os dados ficam armazenados no Redis.</p>
+        <div class="meta">Porta 7070 · <strong>Usa:</strong> Redis</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-go">Go</span>
+          <span class="name">productcatalogservice</span>
+        </div>
+        <p class="desc">Guarda o catálogo de produtos: nomes, preços, descrições e imagens. É consultado por vários serviços, mas nunca modifica os dados.</p>
+        <div class="meta">Porta 3550 · <strong>Chama:</strong> nenhum</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-node">Node</span>
+          <span class="name">currencyservice</span>
+        </div>
+        <p class="desc">Converte valores entre moedas (dólar, euro, real, iene…). Usa taxas reais do Banco Central Europeu salvas em arquivo estático.</p>
+        <div class="meta">Porta 7000 · <strong>Chama:</strong> nenhum</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-node">Node</span>
+          <span class="name">paymentservice</span>
+        </div>
+        <p class="desc">Processa o pagamento com cartão de crédito (simulado — nenhum dinheiro é cobrado). Retorna um identificador de transação.</p>
+        <div class="meta">Porta 50051 · <strong>Chama:</strong> nenhum</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-go">Go</span>
+          <span class="name">shippingservice</span>
+        </div>
+        <p class="desc">Calcula o frete e simula o envio do pedido. Devolve uma estimativa de custo e prazo de entrega.</p>
+        <div class="meta">Porta 50051 · <strong>Chama:</strong> nenhum</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-py">Python</span>
+          <span class="name">emailservice</span>
+        </div>
+        <p class="desc">Envia o e-mail de confirmação do pedido (modo simulado — apenas imprime no log). Usa um template HTML para formatar a mensagem.</p>
+        <div class="meta">Porta 8080 · <strong>Chama:</strong> nenhum</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-go">Go</span>
+          <span class="name">checkoutservice</span>
+        </div>
+        <p class="desc">Orquestra a finalização da compra: consulta o carrinho, calcula frete, cobra o cartão, envia o e-mail. É o maestro do checkout.</p>
+        <div class="meta">Porta 5050 · <strong>Chama:</strong> productcatalog, cart, currency, shipping, payment, email</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-py">Python</span>
+          <span class="name">recommendationservice</span>
+        </div>
+        <p class="desc">Sugere produtos com base no carrinho ("quem comprou isso também comprou…"). A seleção é aleatória, filtrada pelos itens já presentes.</p>
+        <div class="meta">Porta 8080 · <strong>Chama:</strong> productcatalogservice</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-java">Java</span>
+          <span class="name">adservice</span>
+        </div>
+        <p class="desc">Exibe anúncios de acordo com o contexto do produto. Retorna até dois anúncios aleatórios de um mapa pré-definido em memória.</p>
+        <div class="meta">Porta 9555 · <strong>Chama:</strong> nenhum</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-redis">Redis</span>
+          <span class="name">redis-cart</span>
+        </div>
+        <p class="desc">Banco de dados em memória que persiste os carrinhos de compra. Toda alteração no carrinho passa por ele.</p>
+        <div class="meta">Porta 6379</div>
+      </div>
+
+      <div class="service-item">
+        <div class="head">
+          <span class="lang-badge lang-locust">Python</span>
+          <span class="name">loadgenerator</span>
+        </div>
+        <p class="desc">Simular centenas de usuários acessando a loja simultaneamente. Usa a ferramenta Locust para gerar tráfego e testar a resiliência do sistema.</p>
+        <div class="meta"><strong>Chama:</strong> frontend (HTTP)</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Fluxo de uma requisição</h2>
+    <p class="section-intro">
+      Quando você abre a página inicial, o frontend orquestra uma série de chamadas para montar a loja que você vê.
+    </p>
+
+    <div class="flow-wrapper">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" style="max-width:100%; height:auto; display:block;">
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L8,5 L0,9" fill="none" stroke="oklch(0.55 0.18 270)" stroke-width="1.5"/>
+          </marker>
+          <marker id="a-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L8,5 L0,9" fill="none" stroke="#DC382D" stroke-width="1.5"/>
+          </marker>
+          <filter id="glow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="oklch(0.55 0.18 270)" flood-opacity="0.25"/></filter>
+        </defs>
+
+        <!-- Browser -->
+        <rect x="395" y="12" width="170" height="40" rx="20" fill="oklch(0.24 0.01 270)" stroke="oklch(0.36 0.02 270)" stroke-width="1.5"/>
+        <text x="480" y="37" text-anchor="middle" fill="#e8eaed" font-size="13" font-weight="600" font-family="system-ui,-apple-system,sans-serif">🌐 Seu Navegador</text>
+
+        <!-- Arrow browser → frontend -->
+        <line x1="480" y1="52" x2="480" y2="85" stroke="oklch(0.55 0.12 270)" stroke-width="2" marker-end="url(#a)"/>
+        <rect x="448" y="61" width="64" height="18" rx="9" fill="oklch(0.3 0.02 270)"/>
+        <text x="480" y="74" text-anchor="middle" fill="oklch(0.65 0.12 270)" font-size="9" font-weight="600" font-family="system-ui,-apple-system,sans-serif">HTTP</text>
+
+        <!-- Frontend -->
+        <rect x="290" y="92" width="380" height="52" rx="10" fill="oklch(0.28 0.06 270)" stroke="oklch(0.55 0.18 270)" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="480" y="117" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="system-ui,-apple-system,sans-serif">frontend</text>
+        <text x="480" y="133" text-anchor="middle" fill="oklch(0.6 0.03 270)" font-size="11" font-family="system-ui,-apple-system,sans-serif">Go · porta 8080 (HTTP)</text>
+
+        <!-- Arrows frontend → services -->
+        <line x1="480" y1="144" x2="90" y2="230" stroke="oklch(0.55 0.18 270 / 0.4)" stroke-width="1.5" marker-end="url(#a)"/>
+        <line x1="480" y1="144" x2="220" y2="230" stroke="oklch(0.55 0.18 270 / 0.55)" stroke-width="1.5" marker-end="url(#a)"/>
+        <line x1="480" y1="144" x2="350" y2="230" stroke="oklch(0.55 0.18 270 / 0.7)" stroke-width="1.5" marker-end="url(#a)"/>
+        <line x1="480" y1="144" x2="480" y2="230" stroke="oklch(0.55 0.18 270 / 0.85)" stroke-width="2" marker-end="url(#a)"/>
+        <line x1="480" y1="144" x2="610" y2="230" stroke="oklch(0.55 0.18 270 / 0.7)" stroke-width="1.5" marker-end="url(#a)"/>
+        <line x1="480" y1="144" x2="740" y2="230" stroke="oklch(0.55 0.18 270 / 0.55)" stroke-width="1.5" marker-end="url(#a)"/>
+        <line x1="480" y1="144" x2="870" y2="230" stroke="oklch(0.55 0.18 270 / 0.4)" stroke-width="1.5" marker-end="url(#a)"/>
+
+        <!-- gRPC badges on arrows -->
+        <rect x="278" y="181" width="42" height="18" rx="9" fill="oklch(0.22 0.01 270)" stroke="oklch(0.55 0.18 270 / 0.4)" stroke-width="1"/>
+        <text x="299" y="194" text-anchor="middle" fill="oklch(0.55 0.12 270)" font-size="9" font-family="system-ui,-apple-system,sans-serif">gRPC</text>
+
+        <rect x="413" y="181" width="42" height="18" rx="9" fill="oklch(0.22 0.01 270)" stroke="oklch(0.55 0.18 270 / 0.7)" stroke-width="1"/>
+        <text x="434" y="194" text-anchor="middle" fill="oklch(0.55 0.12 270)" font-size="9" font-family="system-ui,-apple-system,sans-serif">gRPC</text>
+
+        <rect x="546" y="181" width="42" height="18" rx="9" fill="oklch(0.22 0.01 270)" stroke="oklch(0.55 0.18 270 / 0.7)" stroke-width="1"/>
+        <text x="567" y="194" text-anchor="middle" fill="oklch(0.55 0.12 270)" font-size="9" font-family="system-ui,-apple-system,sans-serif">gRPC</text>
+
+        <!-- Services Row -->
+        <g font-family="system-ui,-apple-system,sans-serif">
+          <!-- currencyservice (Node) -->
+          <rect x="35" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="35" y="236" width="110" height="4" rx="2" fill="#339933"/>
+          <text x="90" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">currency</text>
+          <text x="90" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">7000</text>
+
+          <!-- productcatalogservice (Go) -->
+          <rect x="165" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="165" y="236" width="110" height="4" rx="2" fill="#00ADD8"/>
+          <text x="220" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">catalog</text>
+          <text x="220" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">3550</text>
+
+          <!-- cartservice (C#) -->
+          <rect x="295" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="295" y="236" width="110" height="4" rx="2" fill="#9B59B6"/>
+          <text x="350" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">cart</text>
+          <text x="350" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">7070</text>
+
+          <!-- adservice (Java) -->
+          <rect x="425" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="425" y="236" width="110" height="4" rx="2" fill="#ED8B00"/>
+          <text x="480" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">ads</text>
+          <text x="480" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">9555</text>
+
+          <!-- recommendationservice (Python) -->
+          <rect x="555" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="555" y="236" width="110" height="4" rx="2" fill="#306998"/>
+          <text x="610" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">recommend</text>
+          <text x="610" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">8080</text>
+
+          <!-- shippingservice (Go) -->
+          <rect x="685" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="685" y="236" width="110" height="4" rx="2" fill="#00ADD8"/>
+          <text x="740" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">shipping</text>
+          <text x="740" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">50051</text>
+
+          <!-- checkoutservice (Go) -->
+          <rect x="815" y="236" width="110" height="56" rx="6" fill="oklch(0.22 0.01 270)" stroke="oklch(0.32 0.03 270)" stroke-width="1"/>
+          <rect x="815" y="236" width="110" height="4" rx="2" fill="#00ADD8"/>
+          <text x="870" y="261" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600">checkout</text>
+          <text x="870" y="279" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10">5050</text>
+        </g>
+
+        <!-- Redis (below cart) -->
+        <rect x="300" y="315" width="100" height="46" rx="6" fill="oklch(0.22 0.01 270)" stroke="#DC382D" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="300" y="315" width="100" height="4" rx="2" fill="#DC382D"/>
+        <text x="350" y="340" text-anchor="middle" fill="#e8eaed" font-size="12" font-weight="600" font-family="system-ui,-apple-system,sans-serif">redis-cart</text>
+        <text x="350" y="353" text-anchor="middle" fill="oklch(0.5 0.03 270)" font-size="10" font-family="system-ui,-apple-system,sans-serif">6379</text>
+
+        <!-- Arrow cart → Redis -->
+        <line x1="350" y1="292" x2="350" y2="310" stroke="#DC382D" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a-red)"/>
+      </svg>
+    </div>
+
+    <ol class="steps">
+      <li>Frontend pede a <strong>lista de moedas</strong> → currencyservice</li>
+      <li>Frontend pede o <strong>catálogo de produtos</strong> → productcatalogservice</li>
+      <li>Frontend busca o <strong>carrinho do usuário</strong> → cartservice → Redis</li>
+      <li>Frontend <strong>converte os preços</strong> → currencyservice</li>
+      <li>Frontend solicita <strong>anúncios</strong> → adservice</li>
+      <li>Frontend <strong>renderiza o HTML final</strong> → envia ao navegador</li>
+    </ol>
+
+    <p style="font-size:0.92rem; color:var(--ink-muted);">
+      Ao finalizar a compra, o frontend chama o <strong>checkoutservice</strong>, que coordena o resto:
+      busca o carrinho, calcula frete, processa o pagamento e envia o e-mail de confirmação.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Deploy no Kubernetes com Helm</h2>
+    <p class="section-intro">
+      O Helm é o gerenciador de pacotes do Kubernetes. Com dois comandos você sobe a loja completa no seu cluster.
+    </p>
+
+    <div class="cmd-group">
+      <h3>Pré-requisitos</h3>
+      <div class="cmd-box">
+        <pre><span class="comment"># Verificar se o cluster está rodando</span>
+<span class="prompt">$</span> kubectl cluster-info
+
+<span class="comment"># Verificar versão do Helm</span>
+<span class="prompt">$</span> helm version
+
+<span class="comment"># (Opcional) Login no Docker Hub se for buildar suas imagens</span>
+<span class="prompt">$</span> docker login</pre>
+      </div>
+    </div>
+
+    <div class="cmd-group">
+      <h3>Build e push das imagens (Docker Hub)</h3>
+      <p class="desc">Builda todos os 11 microsserviços e envia para seu Docker Hub. Cada imagem é construída em 3 ondas para otimizar recursos.</p>
+      <div class="cmd-box">
+        <pre><span class="comment"># Buildar todas as imagens e fazer push</span>
+<span class="prompt">$</span> ./build.sh
+      </div>
+    </div>
+
+    <div class="cmd-group">
+      <h3>Deploy com suas imagens (Docker Hub)</h3>
+      <p class="desc">Usa o chart Helm local apontando para suas imagens no Docker Hub.</p>
+      <div class="cmd-box">
+        <pre><span class="comment"># Deploy direto (usa deploy.sh)</span>
+<span class="prompt">$</span> ./deploy.sh
+
+<span class="comment"># Ou manualmente:</span>
+<span class="prompt">$</span> helm upgrade onlineboutique ./helm-chart \
+    --install \
+    --create-namespace \
+    --namespace onlineboutique \
+    --set images.repository=juniorjbn \
+    --set images.tag=v1.0.0
+
+<span class="comment"># Acompanhar os pods</span>
+<span class="prompt">$</span> kubectl get pods -n onlineboutique -w
+
+<span class="comment"># Acessar a loja (port-forward sem LoadBalancer)</span>
+<span class="prompt">$</span> kubectl port-forward -n onlineboutique \
+    svc/frontend-external 8080:80
+
+<span class="comment"># Abra http://localhost:8080</span></pre>
+      </div>
+    </div>
+
+    <div class="cmd-group">
+      <h3>Deploy básico</h3>
+      <p class="desc">Sobe todos os serviços com configurações padrão. O frontend fica acessível via LoadBalancer.</p>
+      <div class="cmd-box">
+        <pre><span class="prompt">$</span> helm upgrade onlineboutique \
+    oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique \
+    --install \
+    --create-namespace \
+    --namespace onlineboutique</pre>
+      </div>
+    </div>
+
+    <div class="cmd-group">
+      <h3>Deploy local (Minikube / Kind / K3s)</h3>
+      <p class="desc">Usa <code>port-forward</code> para acessar o frontend sem LoadBalancer.</p>
+      <div class="cmd-box">
+        <pre><span class="prompt">$</span> helm upgrade onlineboutique \
+    oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique \
+    --install \
+    --create-namespace \
+    --namespace onlineboutique \
+    --set frontend.externalService=false
+
+<span class="prompt">$</span> kubectl port-forward -n onlineboutique \
+    svc/frontend 8080:80
+
+<span class="comment"># Acesse: http://localhost:8080</span></pre>
+      </div>
+    </div>
+
+    <div class="cmd-group">
+      <h3>Deploy com Google Cloud e Service Mesh</h3>
+      <p class="desc">Ativa NetworkPolicies, Istio sidecars, Workload Identity e substitui o Redis pelo Cloud Spanner.</p>
+      <div class="cmd-box">
+        <pre><span class="prompt">$</span> helm upgrade onlineboutique \
+    oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique \
+    --install \
+    --create-namespace \
+    --namespace onlineboutique \
+    --set images.repository=us-docker.pkg.dev/MEU_PROJETO/containers/onlineboutique \
+    --set frontend.externalService=false \
+    --set redis.create=false \
+    --set cartservice.database.type=spanner \
+    --set cartservice.database.connectionString=projects/MEU_PROJETO/instances/onlineboutique/databases/carts \
+    --set serviceAccounts.create=true \
+    --set authorizationPolicies.create=true \
+    --set networkPolicies.create=true \
+    --set sidecars.create=true \
+    --set frontend.virtualService.create=true</pre>
+      </div>
+    </div>
+
+    <div class="cmd-label">Comandos úteis</div>
+    <div class="cmd-box">
+      <pre><span class="prompt">$</span> kubectl get pods -n onlineboutique
+<span class="prompt">$</span> kubectl logs -n onlineboutique deployment/frontend
+<span class="prompt">$</span> kubectl get svc -n onlineboutique frontend-external
+
+<span class="comment"># Remover tudo</span>
+<span class="prompt">$</span> helm uninstall onlineboutique -n onlineboutique
+<span class="prompt">$</span> kubectl delete namespace onlineboutique</pre>
+    </div>
+
+    <div class="cmd-group" style="margin-top:32px;">
+      <h3>Deploy sem Helm (kubectl direto)</h3>
+      <p class="desc">Os manifests estão na pasta <code>kubernetes-manifests/</code>.</p>
+      <div class="cmd-box">
+        <pre><span class="prompt">$</span> kubectl apply -f kubernetes-manifests/
+<span class="prompt">$</span> kubectl get pods
+
+<span class="comment"># Acessar via LoadBalancer</span>
+<span class="prompt">$</span> kubectl get svc frontend-external</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><a href="https://github.com/GoogleCloudPlatform/microservices-demo">github.com/GoogleCloudPlatform/microservices-demo</a></p>
+</footer>
+
+</body>
+</html>

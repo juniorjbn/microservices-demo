@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"mime"
 	"net/http"
 	"os"
 	"time"
@@ -36,12 +37,13 @@ import (
 
 const (
 	port            = "8080"
-	defaultCurrency = "USD"
+	defaultCurrency = "BRL"
 	cookieMaxAge    = 60 * 60 * 48
 
 	cookiePrefix    = "shop_"
 	cookieSessionID = cookiePrefix + "session-id"
 	cookieCurrency  = cookiePrefix + "currency"
+	cookieLocale    = cookiePrefix + "locale"
 )
 
 var (
@@ -51,7 +53,8 @@ var (
 		"CAD": true,
 		"JPY": true,
 		"GBP": true,
-		"TRY": true}
+		"TRY": true,
+		"BRL": true}
 )
 
 type ctxKeySessionID struct{}
@@ -95,6 +98,8 @@ func main() {
 		TimestampFormat: time.RFC3339Nano,
 	}
 	log.Out = os.Stdout
+
+	mime.AddExtensionType(".woff2", "font/woff2")
 
 	svc := new(frontendServer)
 
@@ -144,6 +149,7 @@ func main() {
 	r.HandleFunc("/cart", svc.addToCartHandler).Methods(http.MethodPost)
 	r.HandleFunc("/cart/empty", svc.emptyCartHandler).Methods(http.MethodPost)
 	r.HandleFunc("/setCurrency", svc.setCurrencyHandler).Methods(http.MethodPost)
+	r.HandleFunc("/setLocale", svc.setLocaleHandler).Methods(http.MethodPost)
 	r.HandleFunc("/logout", svc.logoutHandler).Methods(http.MethodGet)
 	r.HandleFunc("/cart/checkout", svc.placeOrderHandler).Methods(http.MethodPost)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -151,6 +157,7 @@ func main() {
 	r.HandleFunc("/_healthz", func(w http.ResponseWriter, _ *http.Request) { fmt.Fprint(w, "ok") })
 
 	var handler http.Handler = r
+	handler = &securityHeadersHandler{next: handler}   // add security headers
 	handler = &logHandler{log: log, next: handler}     // add logging
 	handler = ensureSessionID(handler)                 // add session ID
 	handler = otelhttp.NewHandler(handler, "frontend") // add OTel tracing

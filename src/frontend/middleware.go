@@ -88,16 +88,19 @@ func ensureSessionID(next http.Handler) http.HandlerFunc {
 		c, err := r.Cookie(cookieSessionID)
 		if err == http.ErrNoCookie {
 			if os.Getenv("ENABLE_SINGLE_SHARED_SESSION") == "true" {
-				// Hard coded user id, shared across sessions
 				sessionID = "12345678-1234-1234-1234-123456789123"
 			} else {
 				u, _ := uuid.NewRandom()
 				sessionID = u.String()
 			}
 			http.SetCookie(w, &http.Cookie{
-				Name:   cookieSessionID,
-				Value:  sessionID,
-				MaxAge: cookieMaxAge,
+				Name:     cookieSessionID,
+				Value:    sessionID,
+				MaxAge:   cookieMaxAge,
+				HttpOnly: true,
+				Secure:   true,
+				SameSite: http.SameSiteStrictMode,
+				Path:     "/",
 			})
 		} else if err != nil {
 			return
@@ -108,4 +111,18 @@ func ensureSessionID(next http.Handler) http.HandlerFunc {
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	}
+}
+
+type securityHeadersHandler struct {
+	next http.Handler
+}
+
+func (h *securityHeadersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Security-Policy",
+		"default-src 'self'; script-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'")
+	w.Header().Set("X-Frame-Options", "DENY")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+	w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+	h.next.ServeHTTP(w, r)
 }

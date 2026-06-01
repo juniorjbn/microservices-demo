@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.21.3-alpine@sha256:926f7f7e1ab8509b4e91d5ec6d5916ebb45155b0c8920291ba9f361d65385806 as builder
+FROM golang:1.24-alpine AS builder
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base
 WORKDIR /src
@@ -26,7 +26,7 @@ COPY . .
 ARG SKAFFOLD_GO_GCFLAGS
 RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/shippingservice .
 
-FROM alpine:3.18.4@sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
+FROM alpine:3.21
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /src
@@ -37,6 +37,9 @@ ENV APP_PORT=50051
 # Default behavior - a failure prints a stack trace for the current goroutine.
 # See https://golang.org/pkg/runtime/
 ENV GOTRACEBACK=single
+
+RUN adduser -D -u 10001 appuser
+USER appuser
 
 EXPOSE 50051
 ENTRYPOINT ["/src/shippingservice"]

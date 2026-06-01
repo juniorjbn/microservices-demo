@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.11.6-slim@sha256:e932b9a0f25c306d542fc69133d24b872a6a264810e300b553e7ecd027599ca5 as base
+FROM python:3.11-slim AS base
 
-FROM base as builder
+FROM base AS builder
 
 COPY requirements.txt .
 
-RUN pip install --prefix="/install" -r requirements.txt
+RUN pip install --no-cache-dir --no-deps --prefix="/install" -r requirements.txt
 
 FROM base
 
@@ -31,5 +31,8 @@ COPY locustfile.py .
 
 # enable gevent support in debugger
 ENV GEVENT_SUPPORT=True
+
+RUN groupadd -r appuser && useradd -r -g appuser -u 10001 appuser
+USER appuser
 
 ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u "${USERS:-10}" 2>&1
