@@ -2,7 +2,7 @@
 set -euo pipefail
 
 NAMESPACE="onlineboutique"
-CHART="./helm-chart"
+CHART="oci://registry-1.docker.io/juniorjbn/onlineboutique"
 REGISTRY="juniorjbn"
 TAG="v1.0.0"
 
@@ -23,8 +23,7 @@ helm upgrade --install onlineboutique "${CHART}" \
   --set images.tag="${TAG}" \
   --set cartDatabase.inClusterRedis.create=true \
   --set cartDatabase.inClusterRedis.publicRepository=true \
-  --wait \
-  --timeout 15m
+  --set frontend.externalService=false
 
 echo ""
 echo "══════════════════════════════════════════════════"

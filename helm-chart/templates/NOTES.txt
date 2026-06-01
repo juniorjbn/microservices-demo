@@ -7,6 +7,10 @@ Watch the status of the frontend IP address with:
 Get the external IP address of the frontend:
     export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ .Values.frontend.name }}-external --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
     echo http://$SERVICE_IP
+{{- else }}
+Access the frontend via port-forward (Kind / local clusters):
+    kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ .Values.frontend.name }} 8080:80
+    echo http://localhost:8080
 {{- end }}
 {{- if .Values.frontend.virtualService.create }}
 Get the external IP address of the ingress gateway:

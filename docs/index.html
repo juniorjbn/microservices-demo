@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Online Boutique — Guia do App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -260,8 +263,6 @@
     justify-content: center;
   }
 
-  .steps { counter-reset: step; }
-
   /* ---- Command boxes ---- */
   .cmd-group { margin-top: 24px; }
   .cmd-group h3 {
@@ -333,7 +334,7 @@
 
 <header>
   <div class="container">
-    <img src="https://raw.githubusercontent.com/juniorjbn/microservices-demo/main/src/frontend/static/icons/Hipster_HeroLogoMaroon.svg" width="200" alt="Online Boutique" style="margin-bottom:16px;">
+    <img src="img/Hipster_HeroLogoMaroon.svg" width="200" alt="Online Boutique" style="margin-bottom:16px;">
     <h1>Minimal Boutique</h1>
     <p class="subtitle">
       Fork brasileiro do <strong>Online Boutique</strong> — 11 microsserviços em 6 linguagens.<br>
@@ -509,7 +510,7 @@
           <span class="lang-badge lang-locust">Python</span>
           <span class="name">loadgenerator</span>
         </div>
-        <p class="desc">Simular centenas de usuários acessando a loja simultaneamente. Usa a ferramenta Locust para gerar tráfego e testar a resiliência do sistema.</p>
+        <p class="desc">Simula centenas de usuários acessando a loja simultaneamente. Usa a ferramenta Locust para gerar tráfego e testar a resiliência do sistema.</p>
         <div class="meta"><strong>Chama:</strong> frontend (HTTP)</div>
       </div>
 
@@ -657,24 +658,25 @@
 <span class="comment"># Verificar versão do Helm</span>
 <span class="prompt">$</span> helm version
 
-<span class="comment"># (Opcional) Login no Docker Hub se for buildar suas imagens</span>
-<span class="prompt">$</span> docker login</pre>
+<span class="comment"># Login no Docker Hub (imagens + Helm chart OCI)</span>
+<span class="prompt">$</span> docker login
+<span class="prompt">$</span> helm registry login registry-1.docker.io --username juniorjbn</pre>
       </div>
     </div>
 
     <div class="cmd-group">
-      <h3>Build e push das imagens (Docker Hub)</h3>
-      <p class="desc">Builda todos os 11 microsserviços e envia para <code>juniorjbn/*:v1.0.0</code>.</p>
+      <h3>Build e push das imagens + chart (Docker Hub)</h3>
+      <p class="desc">Builda todos os 11 microsserviços, o Helm chart, e envia para Docker Hub.</p>
       <div class="cmd-box">
-        <pre><span class="comment"># Buildar todas as imagens e fazer push para o Docker Hub</span>
+        <pre><span class="comment"># Login (se ainda não fez)</span>
 <span class="prompt">$</span> docker login
+<span class="prompt">$</span> helm registry login registry-1.docker.io --username juniorjbn
 
-<span class="comment"># Cada serviço é buildado individualmente:</span>
-<span class="prompt">$</span> docker build --platform linux/amd64 \
-    -t juniorjbn/frontend:v1.0.0 src/frontend
-<span class="prompt">$</span> docker push juniorjbn/frontend:v1.0.0
+<span class="comment"># Buildar e fazer push de todas as imagens</span>
+<span class="prompt">$</span> ./build.sh
 
-<span class="comment"># Repetir para os 10 serviços restantes</span>
+<span class="comment"># Publicar o Helm chart no Docker Hub (OCI)</span>
+<span class="prompt">$</span> ./publish-chart.sh
 </pre>
       </div>
     </div>
@@ -704,16 +706,16 @@
     </div>
 
     <div class="cmd-group">
-      <h3>Deploy rápido (Kind + imagens já no Docker Hub)</h3>
-      <p class="desc">Pula o build local e usa as imagens já disponíveis em <code>juniorjbn/*:v1.0.0</code>.</p>
+      <h3>Deploy rápido (Kind + imagens + chart no Docker Hub)</h3>
+      <p class="desc">Pula o build local e usa tudo já disponível em <code>juniorjbn/*:v1.0.0</code>.</p>
       <div class="cmd-box">
         <pre><span class="comment"># Criar cluster</span>
 <span class="prompt">$</span> kind create cluster --name onlineboutique
 
-<span class="comment"># Deploy via script (helm + namespace)</span>
+<span class="comment"># Deploy via helm (chart do Docker Hub OCI)</span>
 <span class="prompt">$</span> ./deploy.sh
 
-<span class="comment"># Port-forward</span>
+<span class="comment"># Port-forward (Kind não tem LoadBalancer)</span>
 <span class="prompt">$</span> kubectl port-forward -n onlineboutique \
     svc/frontend 8080:80
 
