@@ -334,10 +334,10 @@
 
 <header>
   <div class="container">
-    <h1>Online Boutique</h1>
+    <h1>Minimal Boutique</h1>
     <p class="subtitle">
-      Um e-commerce completo feito com 11 microsserviços em 6 linguagens.<br>
-      Cada serviço é independente, tem seu próprio banco de código e se comunica via gRPC.
+      Fork brasileiro do <strong>Online Boutique</strong> — 11 microsserviços em 6 linguagens.<br>
+      🇧🇷 pt-BR · R$ BRL · frontend redesenhado · <code>juniorjbn/*:v1.0.0</code>
     </p>
     <div class="lang-chips">
       <span>Go</span><span>Node.js</span><span>Python</span><span>Java</span><span>C# (.NET)</span><span>Redis</span>
@@ -636,21 +636,32 @@
 
     <div class="cmd-group">
       <h3>Build e push das imagens (Docker Hub)</h3>
-      <p class="desc">Builda todos os 11 microsserviços e envia para seu Docker Hub. Cada imagem é construída em 3 ondas para otimizar recursos.</p>
+      <p class="desc">Builda todos os 11 microsserviços e envia para <code>juniorjbn/*:v1.0.0</code>.</p>
       <div class="cmd-box">
-        <pre><span class="comment"># Buildar todas as imagens e fazer push</span>
-<span class="prompt">$</span> ./build.sh
+        <pre><span class="comment"># Buildar todas as imagens e fazer push para o Docker Hub</span>
+<span class="prompt">$</span> docker login
+
+<span class="comment"># Cada serviço é buildado individualmente:</span>
+<span class="prompt">$</span> docker build --platform linux/amd64 \
+    -t juniorjbn/frontend:v1.0.0 src/frontend
+<span class="prompt">$</span> docker push juniorjbn/frontend:v1.0.0
+
+<span class="comment"># Repetir para os 10 serviços restantes</span>
+</pre>
       </div>
     </div>
 
     <div class="cmd-group">
       <h3>Deploy com suas imagens (Docker Hub)</h3>
-      <p class="desc">Usa o chart Helm local apontando para suas imagens no Docker Hub.</p>
+      <p class="desc">Usa o chart Helm local apontando para suas imagens no Docker Hub em <code>juniorjbn/*:v1.0.0</code>.</p>
       <div class="cmd-box">
-        <pre><span class="comment"># Deploy direto (usa deploy.sh)</span>
-<span class="prompt">$</span> ./deploy.sh
+        <pre><span class="comment"># 1. Criar cluster Kind</span>
+<span class="prompt">$</span> kind create cluster --name onlineboutique
 
-<span class="comment"># Ou manualmente:</span>
+<span class="comment"># 2. Buildar e push das imagens</span>
+<span class="prompt">$</span> ./build.sh
+
+<span class="comment"># 3. Deploy via Helm com suas imagens</span>
 <span class="prompt">$</span> helm upgrade onlineboutique ./helm-chart \
     --install \
     --create-namespace \
@@ -658,66 +669,45 @@
     --set images.repository=juniorjbn \
     --set images.tag=v1.0.0
 
-<span class="comment"># Acompanhar os pods</span>
+<span class="comment"># 4. Carregar imagens no Kind (se não vieram do build.sh)</span>
+<span class="prompt">$</span> kind load docker-image juniorjbn/frontend:v1.0.0 --name onlineboutique
+<span class="prompt">$</span> kind load docker-image juniorjbn/currencyservice:v1.0.0 --name onlineboutique
+<span class="prompt">$</span> # repita para os demais serviços
+
+<span class="comment"># 5. Acompanhar os pods</span>
 <span class="prompt">$</span> kubectl get pods -n onlineboutique -w
 
-<span class="comment"># Acessar a loja (port-forward sem LoadBalancer)</span>
+<span class="comment"># 6. Acessar (port-forward)</span>
 <span class="prompt">$</span> kubectl port-forward -n onlineboutique \
-    svc/frontend-external 8080:80
+    svc/frontend 8080:80
 
 <span class="comment"># Abra http://localhost:8080</span></pre>
       </div>
     </div>
 
     <div class="cmd-group">
-      <h3>Deploy básico</h3>
-      <p class="desc">Sobe todos os serviços com configurações padrão. O frontend fica acessível via LoadBalancer.</p>
+      <h3>Deploy local com Kind</h3>
+      <p class="desc">Usa o chart Helm local com images do Docker Hub (<code>juniorjbn/*:v1.0.0</code>) em cluster Kind.</p>
       <div class="cmd-box">
-        <pre><span class="prompt">$</span> helm upgrade onlineboutique \
-    oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique \
-    --install \
-    --create-namespace \
-    --namespace onlineboutique</pre>
-      </div>
-    </div>
+        <pre><span class="comment"># Criar cluster</span>
+<span class="prompt">$</span> kind create cluster --name onlineboutique
 
-    <div class="cmd-group">
-      <h3>Deploy local (Minikube / Kind / K3s)</h3>
-      <p class="desc">Usa <code>port-forward</code> para acessar o frontend sem LoadBalancer.</p>
-      <div class="cmd-box">
-        <pre><span class="prompt">$</span> helm upgrade onlineboutique \
-    oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique \
+<span class="comment"># Deploy via Helm (chart local)</span>
+<span class="prompt">$</span> helm upgrade onlineboutique ./helm-chart \
     --install \
     --create-namespace \
     --namespace onlineboutique \
-    --set frontend.externalService=false
+    --set images.repository=juniorjbn \
+    --set images.tag=v1.0.0
 
+<span class="comment"># Carregar imagens locais no Kind</span>
+<span class="prompt">$</span> ./deploy.sh
+
+<span class="comment"># Port-forward</span>
 <span class="prompt">$</span> kubectl port-forward -n onlineboutique \
     svc/frontend 8080:80
 
 <span class="comment"># Acesse: http://localhost:8080</span></pre>
-      </div>
-    </div>
-
-    <div class="cmd-group">
-      <h3>Deploy com Google Cloud e Service Mesh</h3>
-      <p class="desc">Ativa NetworkPolicies, Istio sidecars, Workload Identity e substitui o Redis pelo Cloud Spanner.</p>
-      <div class="cmd-box">
-        <pre><span class="prompt">$</span> helm upgrade onlineboutique \
-    oci://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique \
-    --install \
-    --create-namespace \
-    --namespace onlineboutique \
-    --set images.repository=us-docker.pkg.dev/MEU_PROJETO/containers/onlineboutique \
-    --set frontend.externalService=false \
-    --set redis.create=false \
-    --set cartservice.database.type=spanner \
-    --set cartservice.database.connectionString=projects/MEU_PROJETO/instances/onlineboutique/databases/carts \
-    --set serviceAccounts.create=true \
-    --set authorizationPolicies.create=true \
-    --set networkPolicies.create=true \
-    --set sidecars.create=true \
-    --set frontend.virtualService.create=true</pre>
       </div>
     </div>
 
@@ -747,7 +737,11 @@
 </section>
 
 <footer>
-  <p><a href="https://github.com/GoogleCloudPlatform/microservices-demo">github.com/GoogleCloudPlatform/microservices-demo</a></p>
+  <p>
+    <a href="https://github.com/juniorjbn/microservices-demo">github.com/juniorjbn/microservices-demo</a>
+    ·
+    <a href="https://github.com/GoogleCloudPlatform/microservices-demo">original (GoogleCloudPlatform)</a>
+  </p>
 </footer>
 
 </body>
