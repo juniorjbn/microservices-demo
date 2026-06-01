@@ -1,34 +1,26 @@
 <p align="center">
-<img src="/src/frontend/static/images/botique-logo.png" width="180" alt="Minimal Boutique" />
+<img src="/src/frontend/static/icons/Hipster_HeroLogoMaroon.svg" width="300" alt="Online Boutique" />
 </p>
 
-<h1 align="center">Minimal Boutique</h1>
+![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg)
 
-<p align="center">
-  <strong>Online Boutique</strong> — fork em português com BRL como moeda padrão,
-  frontend redesenhado e suporte a i18n (pt-BR/en).
-</p>
+**Online Boutique** is a cloud-first microservices demo application.  The application is a
+web-based e-commerce app where users can browse items,
+add them to the cart, and purchase them.
 
-<p align="center">
-  <a href="https://hub.docker.com/u/juniorjbn">
-    <img src="https://img.shields.io/badge/docker-juniorjbn-2496ED?logo=docker" alt="Docker Hub">
-  </a>
-  <img src="https://img.shields.io/badge/versão-v1.0.0-blue" alt="v1.0.0">
-  <img src="https://img.shields.io/badge/licença-Apache%202.0-green" alt="License">
-</p>
+Google uses this application to demonstrate the use of technologies like
+Kubernetes, GKE, Istio, Stackdriver, and gRPC. This application
+works on any Kubernetes cluster, like Google
+Kubernetes Engine (GKE). It’s **easy to deploy with little to no configuration**.
 
-O **Online Boutique** original é um app de demonstração de microsserviços criado pelo Google.
-Este fork customiza a loja para o público brasileiro:
+If you’re using this demo, please **★Star** this repository to show your interest!
 
-- 🇧🇷 **Idioma**: site em português (pt-BR) com suporte a inglês (en)
-- 💰 **Moeda**: BRL (Real) como padrão, com formatação brasileira (R$ 1.234,56)
-- 🎨 **Design**: frontend redesenhado com CSS Grid, fonte Geist, nav minimalista
-- 🐳 **Imagens**: todas em <code>juniorjbn/*:v1.0.0</code> no Docker Hub
+**Note to Googlers (Google employees):** Please fill out the form at [go/microservices-demo](http://go/microservices-demo).
 
 ## Screenshots
 
-| Home Page | Checkout Screen |
-| --------- | --------------- |
+| Home Page                                                                                                         | Checkout Screen                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [![Screenshot of store homepage](/docs/img/online-boutique-frontend-1.png)](/docs/img/online-boutique-frontend-1.png) | [![Screenshot of checkout screen](/docs/img/online-boutique-frontend-2.png)](/docs/img/online-boutique-frontend-2.png) |
 
 ## Interactive quickstart (GKE)
