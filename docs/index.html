@@ -342,17 +342,45 @@
     <div class="lang-chips">
       <span>Go</span><span>Node.js</span><span>Python</span><span>Java</span><span>C# (.NET)</span><span>Redis</span>
     </div>
+    <div style="margin-top:20px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+      <a href="https://hub.docker.com/u/juniorjbn"><img src="https://img.shields.io/badge/docker-juniorjbn-2496ED?logo=docker" alt="Docker Hub"></a>
+      <img src="https://img.shields.io/badge/versão-v1.0.0-blue" alt="v1.0.0">
+      <img src="https://img.shields.io/badge/licença-Apache%202.0-green" alt="License">
+    </div>
   </div>
 </header>
 
 <section>
   <div class="container">
+    <h2>Screenshots</h2>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+      <a href="img/online-boutique-frontend-1.png">
+        <img src="img/online-boutique-frontend-1.png" alt="Home page" style="width:100%; border-radius:var(--radius); box-shadow:0 2px 16px oklch(0 0 0 / 0.08);">
+      </a>
+      <a href="img/online-boutique-frontend-2.png">
+        <img src="img/online-boutique-frontend-2.png" alt="Checkout screen" style="width:100%; border-radius:var(--radius); box-shadow:0 2px 16px oklch(0 0 0 / 0.08);">
+      </a>
+    </div>
+    <p style="margin-top:12px; font-size:0.88rem; color:var(--ink-muted); text-align:center;">
+      Home page · Checkout screen — frontend redesenhado com locale pt-BR e moeda BRL
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
     <h2>O que é esse app?</h2>
     <p class="section-intro">
-      O <strong>Online Boutique</strong> é uma loja virtual fictícia que vende camisetas, canecas, livros e outros itens.
-      Ele foi criado pelo Google para demonstrar o modelo de <strong>microsserviços</strong>: em vez de um programa monolítico,
-      o app é dividido em serviços pequenos e autônomos, escritos em linguagens diferentes, cada um com uma responsabilidade
-      bem definida. Eles conversam entre si via <strong>gRPC</strong>.
+      O <strong>Online Boutique</strong> é uma loja virtual fictícia criada pelo Google para demonstrar o modelo de
+      <strong>microsserviços</strong>: em vez de um programa monolítico, o app é dividido em 11 serviços pequenos e autônomos,
+      escritos em 6 linguagens diferentes, cada um com uma responsabilidade bem definida.
+      Eles conversam entre si via <strong>gRPC</strong>.
+    </p>
+    <p class="section-intro">
+      Este fork customiza a loja para o público brasileiro:<br>
+      🇧🇷 <strong>Idioma:</strong> site em português (pt-BR) com suporte a inglês (en) · 
+      💰 <strong>Moeda:</strong> BRL (Real) como padrão, formatação brasileira (R$ 1.234,56) · 
+      🎨 <strong>Design:</strong> frontend redesenhado com CSS Grid, fonte Geist, nav minimalista
     </p>
 
     <figure class="arch-figure">
